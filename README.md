@@ -26,7 +26,7 @@ also serves as the base image for some of my Modded Minecraft server images.
         -e MINECRAFT_EULA=true \
         dlord/minecraft
 
-By default, this starts up a Minecraft 1.8.1 server instance. If you wish to
+By default, this starts up a Minecraft 1.10.1 server instance. If you wish to
 start a different Minecraft server version, you need to set the
 `MINECRAFT_VERSION` variable to the appropriate version.
 
@@ -45,27 +45,17 @@ much as I want to package the Minecraft server jar in this image (to also save
 on time and the hassle of an extra step), I cannot due to the [Minecraft EULA][]. 
 
 
-### Data volumes
+### Data volumes ( DEPRECATED )
 
-This image has one data volume: `/var/lib/minecraft`. This volume contains world
-data. This is a deliberate decision in order to support building Docker images
-with a world template (useful for custom maps).
+This functionality was converted in favor of using host mounting. My use case involves
+mounting an EBS volume in AWS which was better for my phoenix architecure.  If you
+prefer the data volume approach you should check out the original repo  https://github.com/dlord/minecraft-docker
 
-All other server-related artifacts (jars, configs) are in `/opt/minecraft`. This
-is not declared as a data volume, as this can be used as a base image for
-making a docker image for modpacks (see below). You may opt to declare this as a
-data volume if you wish to be able to save its contents when the container is
-deleted.
 
-The recommended approach to handling world data is to use a separate data
-volume container. You can create one with the following command:
+### World Mounting
 
-    docker run --name minecraft-data -v /var/lib/minecraft java:7 true
-
-The startup script updates the permissions of the data volumes before running
-Minecraft. You are free to modify the contents of these directories without
-worrying about permissions.
-
+For best results mount a host directory to WORLD_DATA directory, if not world retrieval may be difficult.
+Mountpoints will be added in the future for configuration settings.
 
 ### Environment Variables
 
