@@ -1,8 +1,8 @@
 #!/bin/bash
 
 TMUX_SESSION=minecraft
-MINECRAFT_HOME="/opt/minecraft"
-MINECRAFT_SRC="/usr/src/minecraft"
+MINECRAFT_HOME=${MINECRAFT_HOME:-"/opt/minecraft"}
+WORLD_DIR=${WORLD_DIR:-"/opt/minecraft/world"}
 MINECRAFT_VERSION=${MINECRAFT_VERSION:-1.10.1}
 MINECRAFT_JAR=${MINECRAFT_JAR:-"minecraft_server.$MINECRAFT_VERSION.jar"}
 MINECRAFT_STARTUP_JAR=${MINECRAFT_STARTUP_JAR:-"$MINECRAFT_JAR"}
@@ -40,12 +40,6 @@ download_server() {
 }
 
 first_run() {
-    # Sync files from $MINECRAFT_SRC to $MINECRAFT_HOME. Do this on container's first run.
-    if [ -f "/run/first_time" ]; then
-        rsync -avhP --exclude '/world*' $MINECRAFT_SRC/ $MINECRAFT_HOME
-        rm /run/first_time
-    fi
-
     # Create server.properties if it doesn't exist
     if [ ! -f "$MINECRAFT_HOME/server.properties" ]; then
         echo "Creating $MINECRAFT_HOME/server.properties"
@@ -78,13 +72,6 @@ first_run() {
         echo "spawn-monsters=${SPAWN_MONSTERS:-true}" >> $MINECRAFT_HOME/server.properties
         echo "view-distance=${VIEW_DISTANCE:-10}" >> $MINECRAFT_HOME/server.properties
         echo "generate-structures=${GENERATE_STRUCTURES:-true}" >> $MINECRAFT_HOME/server.properties
-    fi
-
-    # Copy world template if there is no world yet.
-    if ! find $MINECRAFT_HOME/world -mindepth 1 -print -quit | grep -q . && { find $MINECRAFT_SRC/world -mindepth 1 -print -quit | grep -q .; }; then
-        echo "World template found in $MINECRAFT_SRC"
-        echo "Creating new world in $MINECRAFT_HOME"
-        cp -rf $MINECRAFT_SRC/world* $MINECRAFT_HOME
     fi
 
     # Create default ops.txt if ops.json does not exist yet.

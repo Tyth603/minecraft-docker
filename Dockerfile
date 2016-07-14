@@ -1,5 +1,5 @@
-FROM java:7
-MAINTAINER John Paul Alcala jp@jpalcala.com
+FROM java:8
+MAINTAINER Chris Davidson cdavidson603@gmail.com
 
 # Taken from Postgres Official Dockerfile.
 # grab gosu for easy step-down from root
